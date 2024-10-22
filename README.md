@@ -38,24 +38,18 @@ Antes de começar, certifique-se de ter instalado:
 1. Clone o repositório:
 
     ```bash
-    git clone https://github.com/seu-usuario/seu-repositorio.git
+    git clone https://github.com/viniciustravenssoli/OP-GG-Clone-in-ASPNET
     ```
-
-2. Navegue até o diretório do projeto:
-
-    ```bash
-    cd seu-repositorio
-    ```
-
-3. Restaure os pacotes NuGet:
+    
+2. Restaure os pacotes NuGet:
 
     ```bash
     dotnet restore
     ```
+    
+3. Configure a string de conexão com o banco de dados no arquivo `appsettings.json`.
 
-4. Configure a string de conexão com o banco de dados no arquivo `appsettings.json`.
-
-5. Crie o banco de dados e aplique as migrações:
+4. Crie o banco de dados e aplique as migrações:
 
     ```bash
     dotnet ef database update
