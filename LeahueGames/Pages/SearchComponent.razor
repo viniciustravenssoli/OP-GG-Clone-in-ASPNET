@@ -1,0 +1,21 @@
+﻿<div class="search-container">
+    <input @bind="SearchSummonerName" placeholder="Summoner Name" />
+    <input @bind="SearchTag" placeholder="Tag" />
+    <button @onclick="HandleSearchClick" class="rounded-button">Search</button>
+    <div class="error-message" style="color: red; margin-top: 10px;" hidden="@string.IsNullOrEmpty(SearchErrorMessage)">
+        @SearchErrorMessage
+    </div>
+</div>
+
+@code {
+    [Parameter] public string SearchSummonerName { get; set; }
+    [Parameter] public string SearchTag { get; set; }
+    [Parameter] public string SearchErrorMessage { get; set; }
+    [Parameter] public EventCallback<Tuple<string, string>> OnSearchClicked { get; set; } // Definido para aceitar Tuple
+
+    private async Task HandleSearchClick()
+    {
+        // Chama o evento que notifica o componente pai para buscar dados
+        await OnSearchClicked.InvokeAsync(new Tuple<string, string>(SearchSummonerName, SearchTag));
+    }
+}

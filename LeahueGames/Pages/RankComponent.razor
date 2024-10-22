@@ -1,0 +1,20 @@
+﻿@using static OPGGBlazorWebAssembly.Models
+@if (RankedData != null && RankedData.Count > 0)
+{
+    @foreach (var rank in RankedData)
+    {
+        <div class="rank-container">
+            <h3>Rank Information</h3>
+            <p>Queue Type: @rank.queueType</p>
+            <p>League Points: @rank.leaguePoints</p>
+            <p>Tier: @rank.tier</p>
+            <p>Rank: @rank.rank</p>
+            <p>Wins: @rank.wins</p>
+            <p>Losses: @rank.losses</p>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public List<Root2> RankedData { get; set; }
+}

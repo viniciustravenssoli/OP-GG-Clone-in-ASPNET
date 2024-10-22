@@ -1,0 +1,14 @@
+﻿.clickable {
+    cursor: pointer;
+    color: blue;
+    text-decoration: underline;
+}
+
+.clickable:hover {
+     color: darkblue;
+}
+
+.highlight {
+    background-color: yellow;
+    font-weight: bold;
+}

@@ -1,0 +1,92 @@
+﻿@page "/games"
+@using LeahueGames.Services
+@using static OPGGBlazorWebAssembly.Models
+@inject IRiotService RiotService
+
+<h3>Games</h3>
+
+<SearchComponent SearchSummonerName="@summonerName"
+                 SearchTag="@tag"
+                 OnSearchClicked="HandleSearchClicked"
+                 SearchErrorMessage="@errorMessage" />
+
+<LoadingComponent IsLoading="@isLoading" />
+
+<RankComponent RankedData="@rankedData" />
+<MatchDetailsComponent MatchData="@matchData" OnParticipantClick="HandleSearchClicked" />
+
+<LoadMoreComponent ShowLoadMore="@showLoadMore" LoadMoreMatches="LoadMoreMatches" />
+
+@code {
+    private string summonerName = string.Empty;
+    private string errorMessage = string.Empty;
+    private List<Root2> rankedData = new List<Root2>();
+    private List<Root> matchData = new List<Root>();
+    private bool isLoading = false;
+    private bool showLoadMore = false;
+    private string summonerId = string.Empty;
+    private int loadedMatches = 5;
+    private string tag = string.Empty;
+
+    // Método que recebe os dados do SearchComponent
+    private async Task HandleSearchClicked(Tuple<string, string> searchData)
+    {
+        summonerName = searchData.Item1; // Atualiza o summonerName
+        tag = searchData.Item2; // Atualiza o tag
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        // Verifica se os valores são válidos
+        if (string.IsNullOrWhiteSpace(summonerName) || string.IsNullOrWhiteSpace(tag))
+        {
+            errorMessage = "Both summoner name and tag are required.";
+            return;
+        }
+
+        // Chama o método do serviço
+        isLoading = true;
+        errorMessage = string.Empty;
+
+        matchData = await RiotService.GetMatchDataArray(summonerName, loadedMatches, tag);
+        if (matchData == null || matchData.Count == 0)
+        {
+            errorMessage = "Summoner not found.";
+            rankedData.Clear();
+            showLoadMore = false;
+        }
+        else
+        {
+            await GetAndSetSummonerId();
+            rankedData = await RiotService.GetPlayerRankedData(summonerId);
+            if(rankedData.Count != 0)
+            {
+                await RiotService.SavePlayerInfo(rankedData[0]);
+            }
+            showLoadMore = true;
+        }
+
+        isLoading = false;
+    }
+
+    private async Task GetAndSetSummonerId()
+    {
+        summonerId = await RiotService.GetPlayerID(summonerName, tag);
+    }
+
+    private async Task LoadMoreMatches()
+    {
+        isLoading = true;
+        loadedMatches += 5;
+        matchData = await RiotService.GetMatchDataArray(summonerName, loadedMatches, tag);
+        isLoading = false;
+    }
+
+    private async Task UpdateSummonerNameAndTag(Tuple<string, string> participantData)
+    {
+        summonerName = participantData.Item1;
+        tag = participantData.Item2;
+        await LoadData();
+    }
+}

@@ -1,0 +1,62 @@
+﻿@page "/leaderboard"
+@using LeahueGames.Services
+@using static OPGGBlazorWebAssembly.Models
+
+@inject IRiotService RiotService
+
+<h3>LeaderBoard</h3>
+
+@if (rank != null)
+{
+    <div class="leaderboard-container">
+        <h2>@rank.name - @rank.tier</h2>
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>Nome do Invocador</th>
+                    <th>Rank</th>
+                    <th>Pontos de Liga</th>
+                    <th>Vitórias</th>
+                    <th>Derrotas</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var summoner in rank.entries.OrderByDescending(s => s.leaguePoints))
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(summoner.summonerName))
+                            {
+                                @summoner.summonerName
+                            }
+                            else
+                            {
+                                @summoner.summonerId
+                            }
+                        </td>
+                        <td>@summoner.rank</td>
+                        <td>@summoner.leaguePoints</td>
+                        <td>@summoner.wins</td>
+                        <td>@summoner.losses</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p>Carregando...</p>
+}
+
+@code {
+    private Rank rank;
+
+    protected override async Task OnInitializedAsync()
+    {
+        rank = await RiotService.GetPlayersAsync();
+    }
+
+  
+}
+

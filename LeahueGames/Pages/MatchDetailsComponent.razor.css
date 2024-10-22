@@ -1,0 +1,17 @@
+﻿.uniform-column {
+    width: 180px; /* Ajuste para a largura desejada */
+    text-align: left; /* Centraliza o texto */
+    overflow: hidden
+}
+
+.damage-column {
+    width: 400px; /* Permite que as colunas de barra de dano se ajustem ao conteúdo */
+}
+
+.winner {
+    background-color: #d4edda; /* Verde claro */
+}
+
+.loser {
+    background-color: #f8d7da; /* Vermelho claro */
+}

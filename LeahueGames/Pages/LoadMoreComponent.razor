@@ -1,0 +1,11 @@
+﻿@if (ShowLoadMore)
+{
+    <div class="loadmore-container">
+        <button class="loadmore rounded-button" @onclick="LoadMoreMatches">Load More</button>
+    </div>
+}
+
+@code {
+    [Parameter] public bool ShowLoadMore { get; set; }
+    [Parameter] public EventCallback LoadMoreMatches { get; set; }
+}

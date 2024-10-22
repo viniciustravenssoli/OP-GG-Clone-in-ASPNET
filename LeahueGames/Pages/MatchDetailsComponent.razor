@@ -1,0 +1,115 @@
+﻿@using static OPGGBlazorWebAssembly.Models
+@if (MatchData != null)
+{
+    @foreach (var match in MatchData)
+    {
+        <div class="match-container">
+            <div class="match-details">
+                <h3>Match Details</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Game ID</th>
+                            <th>Game Mode</th>
+                            <th>Game Type</th>
+                            <th>Game Version</th>
+                            <th>Map ID</th>
+                            <th>Game Duration (Minutes)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@match.info.gameId</td>
+                            <td>@match.info.gameMode</td>
+                            <td>@match.info.gameType</td>
+                            <td>@match.info.gameVersion</td>
+                            <td>@match.info.mapId</td>
+                            <td>@SecondsToMinutes(match.info.gameDuration)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Participants</h3>
+            <table class="participants-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Pick</th>
+                        <th>Gold Earned</th>
+                        <th>Kills</th>
+                        <th>Deaths</th>
+                        <th>Assists</th>
+                        <th>Damage Dealt</th>
+                        <th>Damage Taken</th>
+                        <th>KDA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var participant in match.info.participants)
+                    {
+                        <tr class="@(participant.win ? "winner" : "loser")">
+                            <td class="uniform-column">@participant.teamId</td>
+                            <td class="uniform-column" @onclick="() => OnParticipantClick.InvokeAsync(Tuple.Create(participant.riotIdGameName, participant.riotIdTagline))">
+                                @participant.riotIdGameName
+                            </td>
+                            <td class="uniform-column">
+                                <img src="@($"https://opgg-static.akamaized.net/meta/images/lol/latest/champion/{participant.championName}.png?image=e_upscale,c_crop,h_103,w_103,x_9,y_9/q_auto:good,f_webp,w_160,h_160&v=1724034092925")"
+                                     alt="@participant.championName"
+                                     style="width: 30px; height: 30px; margin-right: 5px;" />
+                                @participant.championName
+                            </td>
+                            <td class="uniform-column">@participant.goldEarned.ToString("N0")</td>
+                            <td class="uniform-column">@participant.kills</td>
+                            <td class="uniform-column">@participant.deaths</td>
+                            <td class="uniform-column">@participant.assists</td>
+                            <td class="damage-column">
+                                <span>@participant.totalDamageDealtToChampions.ToString("N0")</span>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: @(participant.totalDamageDealtToChampions * 100 / match.info.participants.Max(p => p.totalDamageDealtToChampions))%" aria-valuenow="@participant.totalDamageDealtToChampions" aria-valuemin="0" aria-valuemax="@match.info.participants.Max(p => p.totalDamageDealtToChampions)"></div>
+                                </div>
+                            </td>
+                            <td class="damage-column">
+                                <span>@participant.totalDamageTaken.ToString("N0")</span>
+                                <div class="progress">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: @(participant.totalDamageTaken * 100 / match.info.participants.Max(p => p.totalDamageTaken))%" aria-valuenow="@participant.totalDamageTaken" aria-valuemin="0" aria-valuemax="@match.info.participants.Max(p => p.totalDamageTaken)"></div>
+                                </div>
+                            </td>
+                            <td class="uniform-column">@CalculateKDA(participant.kills, participant.deaths, participant.assists)</td>
+                        </tr>
+                    }
+                </tbody>
+
+
+            </table>
+        </div>
+    }
+}
+
+@code {
+    [Parameter]
+    public List<Root> MatchData { get; set; }
+    [Parameter]
+    public EventCallback<Tuple<string, string>> OnParticipantClick { get; set; }
+
+
+    private string CalculateKDA(int kills, int deaths, int assists)
+    {
+        if (deaths == 0)
+        {
+            return "Perfect";
+        }
+        return Math.Round((double)(kills + assists) / deaths, 2).ToString();
+    }
+
+
+    private string SecondsToMinutes(int totalSeconds)
+    {
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return $"{minutes:D2}:{seconds:D2}";
+    }
+
+
+}
